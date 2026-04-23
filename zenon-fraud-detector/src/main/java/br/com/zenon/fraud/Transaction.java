@@ -1,6 +1,6 @@
 package br.com.zenon.fraud;
 
-public record Transaction(int step, TypeEnum type, double amount, String nameOrig, double oldbalanceOrg,
-                          double newbalanceOrig, String nameDest, double oldbalanceDest,
-                          double newbalanceDest, boolean isFraud, boolean isFlaggedFraud) {
+public record Transaction(int step, TransactionType type, double amount, TransactionCustomer origin,
+                          TransactionCustomer recipient, boolean isFraud,
+                          boolean isFlaggedFraud) {
 }

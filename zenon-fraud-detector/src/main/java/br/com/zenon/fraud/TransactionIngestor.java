@@ -10,45 +10,58 @@ import java.util.List;
 
 public class TransactionIngestor {
 
-	public List<Transaction> ingest1000(String fileName) {
+	public List<Transaction> ingest(String fileName) {
 		List<Transaction> transactionList = new ArrayList<>();
-		Path path = Path.of("data/"+fileName);
+		Path path = Path.of("data/" + fileName);
 		// Use try-with-resources to automatically close the file
 		int count = 1;
+		int countTransactions = 0;
 		try (BufferedReader br = new BufferedReader(new FileReader(path.toFile()))) {
-			for(int i=0; i<= 1000;i++){
-				String line = br.readLine();
-				if(i == 0){
-					continue;
+			boolean firstLine = true;
+			String line;
+			while ((line = br.readLine()) != null) {
+				if (!firstLine) {
+					try {
+						Transaction transaction = parseTransaction(line);
+						transactionList.add(parseTransaction(line));
+						countTransactions++;
+					} catch (IllegalArgumentException iae) {
+						IO.println("Erro: " + line + " | " + iae);
+					}
+				} else {
+					firstLine = false;
 				}
-				transactionList.add(parseTransaction(line));
 			}
 		} catch (FileNotFoundException e) {
-			IO.println("Arquivo não encontrado.");
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			IO.println("Erro ao ler o arquivo.");
-			throw new RuntimeException(e);
+			throw new RuntimeException("Arquivo não encontrado.", e);
+		} catch (
+				IOException e) {
+			throw new RuntimeException("Erro ao ler o arquivo.", e);
 		}
+
+		IO.println(countTransactions);
+		transactionList.forEach(IO::println);
 		return transactionList;
 	}
 
 	private Transaction parseTransaction(String line) {
 		String[] columns = line.split(",");
 		Transaction transaction = null;
-		try {
-			transaction = new Transaction(
-					Integer.parseInt(columns[0]),
-					TransactionType.valueOf(columns[1]),
-					Double.parseDouble(columns[2]),
-					new TransactionCustomer(columns[3], Double.parseDouble(columns[4]), Double.parseDouble(columns[5])),
-					new TransactionCustomer(columns[6], Double.parseDouble(columns[7]), Double.parseDouble(columns[8])),
-					Integer.parseInt(columns[9]) == 0,
-					Integer.parseInt(columns[10]) == 0);
-		} catch (Exception e) {
-			IO.println("Erro ao converter a linha para Transaction.");
-			throw new RuntimeException(e);
-		}
+		//try {
+		transaction = new Transaction(
+				Integer.parseInt(columns[0]),
+				TransactionType.valueOf(columns[1]),
+				Double.parseDouble(columns[2]),
+				new TransactionCustomer(columns[3], Double.parseDouble(columns[4]), Double.parseDouble(columns[5])),
+				new TransactionCustomer(columns[6], Double.parseDouble(columns[7]), Double.parseDouble(columns[8])),
+				Integer.parseInt(columns[9]) == 0,
+				Integer.parseInt(columns[10]) == 0);
+		//} catch (NumberFormatException e) {
+		//	throw new RuntimeException();
+		//}
+		//catch (Exception e) {
+		//	throw new RuntimeException("Erro ao converter a linha para Transaction.", e);
+		//}
 		return transaction;
 	}
 }

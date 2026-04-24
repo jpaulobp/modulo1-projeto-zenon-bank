@@ -14,7 +14,6 @@ public class TransactionIngestor {
 		List<Transaction> transactionList = new ArrayList<>();
 		Path path = Path.of("data/" + fileName);
 		// Use try-with-resources to automatically close the file
-		int count = 1;
 		int countTransactions = 0;
 		try (BufferedReader br = new BufferedReader(new FileReader(path.toFile()))) {
 			boolean firstLine = true;
@@ -22,7 +21,6 @@ public class TransactionIngestor {
 			while ((line = br.readLine()) != null) {
 				if (!firstLine) {
 					try {
-						Transaction transaction = parseTransaction(line);
 						transactionList.add(parseTransaction(line));
 						countTransactions++;
 					} catch (IllegalArgumentException iae) {
@@ -46,9 +44,7 @@ public class TransactionIngestor {
 
 	private Transaction parseTransaction(String line) {
 		String[] columns = line.split(",");
-		Transaction transaction = null;
-		//try {
-		transaction = new Transaction(
+		return new Transaction(
 				Integer.parseInt(columns[0]),
 				TransactionType.valueOf(columns[1]),
 				Double.parseDouble(columns[2]),
@@ -56,12 +52,5 @@ public class TransactionIngestor {
 				new TransactionCustomer(columns[6], Double.parseDouble(columns[7]), Double.parseDouble(columns[8])),
 				Integer.parseInt(columns[9]) == 0,
 				Integer.parseInt(columns[10]) == 0);
-		//} catch (NumberFormatException e) {
-		//	throw new RuntimeException();
-		//}
-		//catch (Exception e) {
-		//	throw new RuntimeException("Erro ao converter a linha para Transaction.", e);
-		//}
-		return transaction;
 	}
 }

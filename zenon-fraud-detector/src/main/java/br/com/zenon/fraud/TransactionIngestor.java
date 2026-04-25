@@ -12,34 +12,21 @@ import java.util.Optional;
 public class TransactionIngestor {
 
 	public List<Transaction> ingest(String fileName) {
-		List<Transaction> transactionList = new ArrayList<>();
+		List<String> lines = new ArrayList<>();
 		Path path = Path.of("data/" + fileName);
 		// Use try-with-resources to automatically close the file
-		int countTransactions = 0;
 		try (BufferedReader br = new BufferedReader(new FileReader(path.toFile()))) {
-			boolean firstLine = true;
 			String line;
 			while ((line = br.readLine()) != null) {
-				if (!firstLine) {
-					Optional<Transaction> optionalTransaction = parseTransaction(line);
-					if(optionalTransaction.isPresent()) {
-						transactionList.add(optionalTransaction.get());
-						countTransactions++;
-					}
-				} else {
-					firstLine = false;
-				}
+					lines.add(line);
 			}
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("Arquivo não encontrado.", e);
-		} catch (
-				IOException e) {
+		} catch (IOException e) {
 			throw new RuntimeException("Erro ao ler o arquivo.", e);
 		}
 
-		IO.println(countTransactions);
-		transactionList.forEach(IO::println);
-		return transactionList;
+		return lines.stream().skip(1).map(this::parseTransaction).filter(Optional::isPresent).map(Optional::get).toList();
 	}
 
 	private Optional<Transaction> parseTransaction(String line) {

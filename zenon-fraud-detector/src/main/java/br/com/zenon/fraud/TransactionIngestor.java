@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class TransactionIngestor {
 
@@ -20,11 +21,10 @@ public class TransactionIngestor {
 			String line;
 			while ((line = br.readLine()) != null) {
 				if (!firstLine) {
-					try {
-						transactionList.add(parseTransaction(line));
+					Optional<Transaction> optionalTransaction = parseTransaction(line);
+					if(optionalTransaction.isPresent()) {
+						transactionList.add(optionalTransaction.get());
 						countTransactions++;
-					} catch (IllegalArgumentException iae) {
-						IO.println("Erro: " + line + " | " + iae);
 					}
 				} else {
 					firstLine = false;
@@ -42,15 +42,21 @@ public class TransactionIngestor {
 		return transactionList;
 	}
 
-	private Transaction parseTransaction(String line) {
+	private Optional<Transaction> parseTransaction(String line) {
 		String[] columns = line.split(",");
-		return new Transaction(
-				Integer.parseInt(columns[0]),
-				TransactionType.valueOf(columns[1]),
-				Double.parseDouble(columns[2]),
-				new TransactionCustomer(columns[3], Double.parseDouble(columns[4]), Double.parseDouble(columns[5])),
-				new TransactionCustomer(columns[6], Double.parseDouble(columns[7]), Double.parseDouble(columns[8])),
-				Integer.parseInt(columns[9]) == 0,
-				Integer.parseInt(columns[10]) == 0);
+		Transaction transaction = null;
+		try {
+			int step = Integer.parseInt(columns[0]);
+			TransactionType transactionType = TransactionType.valueOf(columns[1]);
+			double amount = Double.parseDouble(columns[2]);
+			TransactionCustomer origin = new TransactionCustomer(columns[3], Double.parseDouble(columns[4]), Double.parseDouble(columns[5]));
+			TransactionCustomer recipient = new TransactionCustomer(columns[6], Double.parseDouble(columns[7]), Double.parseDouble(columns[8]));
+			boolean isFraud = Integer.parseInt(columns[9]) == 0;
+			boolean isFlaggedFraud = Integer.parseInt(columns[10]) == 0;
+			transaction = new Transaction(step, transactionType, amount, origin, recipient, isFraud, isFlaggedFraud);
+		} catch (Exception e) {
+			IO.println("Erro: " + line + " | " + e);
+		}
+		return Optional.ofNullable(transaction);
 	}
 }

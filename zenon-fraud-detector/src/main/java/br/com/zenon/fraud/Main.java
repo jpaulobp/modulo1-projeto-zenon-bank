@@ -7,10 +7,17 @@ public class Main {
 	void main() {
 
 		TransactionIngestor ingestor = new TransactionIngestor();
-		//transactionList = ingestor.ingest("PS_20174392719_1491204439457_log.csv");
-		List<Transaction> transactionList = ingestor.ingest("paysim_with_bad_data.csv");
-		IO.println(transactionList.size());
-		transactionList.forEach(IO::println);
+		List<Transaction> transactionList = ingestor.ingest("PS_20174392719_1491204439457_log.csv", 50_000);
+		//List<Transaction> transactionList = ingestor.ingest("paysim_with_bad_data.csv", 0);
+		FraudAnalyzer analyzer = new FraudAnalyzer(transactionList);
+		IO.println("1. Total de fraudes: " + analyzer.fraudCount());
+		IO.println("2. Top 3 Fraudes de Maior Valor:");
+		analyzer.getHigherValueFrauds(3).stream().map(Transaction::amount).forEach(IO::println);
+		IO.println("3. Clientes Suspeitos:");
+		analyzer.getOriginByHigherValueFrauds().stream().limit(5).map(TransactionCustomer::name).forEach(IO::println);
+		IO.println("4. Prejuízo Total: " + analyzer.getTotalLoss());
+		IO.println("5.  Fraudes por Tipo:");
+		analyzer.getCountByTransactionType().forEach((chave, valor) -> IO.println(chave + ": " + valor));
 
 	}
 }

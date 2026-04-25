@@ -1,6 +1,8 @@
 package br.com.zenon.fraud;
 
-public record Transaction(int step, TransactionType type, double amount, TransactionCustomer origin,
+import java.math.BigDecimal;
+
+public record Transaction(int step, TransactionType type, BigDecimal amount, TransactionCustomer origin,
                           TransactionCustomer recipient, boolean isFraud,
                           boolean isFlaggedFraud) {
 
@@ -8,8 +10,8 @@ public record Transaction(int step, TransactionType type, double amount, Transac
 		validateParameters(step, amount);
 	}
 
-	private void validateParameters(int step, double amount ) {
+	private void validateParameters(int step, BigDecimal amount ) {
 		if(step <= 0) throw new IllegalArgumentException("step should be positive: " + step);
-		if(amount < 0.0) throw new IllegalArgumentException("amount should be positive: " + amount);
+		if(amount.compareTo(BigDecimal.ZERO) <= 0) throw new IllegalArgumentException("amount should be positive: " + amount);
 	}
 }

@@ -36,29 +36,23 @@ public class Main {
 		IO.println("----------");
 
 		originName = "C1868032458";
-		long ini0 = System.nanoTime();
+		long listStartTime = System.nanoTime();
 		findTransactionByOriginName(listRepository, originName);
-		long fim0 = System.nanoTime();
-		long tempo0 = fim0 - ini0;
-		IO.println("Tempo da busca: " + tempo0 + " ns");
+		long listEndTime = System.nanoTime();
+		long listTime = (listEndTime - listStartTime)/1_000_000;
+		IO.println("Tempo da busca: " + listTime + " ms");
 
 		IO.println("----------");
 		TransactionMapRepository mapRepository = new TransactionMapRepository(transactionList);
-		long ini1 = System.nanoTime();
+		long mapStartTime = System.nanoTime();
 		findTransactionByOriginName(mapRepository, originName);
-		long fim1 = System.nanoTime();
-		long tempo1 = fim1 - ini1;
-		IO.println("Tempo da busca: " + tempo1 + " ns");
+		long mapEndTime = System.nanoTime();
+		long mapTime = (mapEndTime - mapStartTime)/1_000_000;
+		IO.println("Tempo da busca: " + mapTime + " ms");
 
 	}
 
 	private static void findTransactionByOriginName(TransactionRepository repository, String originName) {
-		Optional<Transaction> transaction;
-		transaction = repository.findByOriginName(originName);
-		if (transaction.isPresent()) {
-			IO.println(transaction);
-		} else {
-			IO.println("Transação não encontrada para o cliente " + originName);
-		}
+		repository.findByOriginName(originName).ifPresentOrElse(IO::println, () -> IO.println("Transação não encontrada para o cliente " + originName));
 	}
 }

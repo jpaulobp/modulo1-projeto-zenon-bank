@@ -12,12 +12,12 @@ public class Main {
 		FraudAnalyzer analyzer = new FraudAnalyzer(transactionList);
 		IO.println("1. Total de fraudes: " + analyzer.fraudCount());
 		IO.println("2. Top 3 Fraudes de Maior Valor:");
-		analyzer.getHigherValueFrauds(3).stream().map(Transaction::amount).forEach(IO::println);
+		analyzer.getHighestValueFrauds(3).forEach(IO::println);
 		IO.println("3. Clientes Suspeitos:");
-		analyzer.getOriginByHigherValueFrauds().stream().limit(5).map(TransactionCustomer::name).forEach(IO::println);
+		analyzer.getTopSuspiciousClients(5).forEach(IO::println);
 		IO.println("4. Prejuízo Total: " + analyzer.getTotalLoss());
 		IO.println("5.  Fraudes por Tipo:");
-		analyzer.getCountByTransactionType().forEach((chave, valor) -> IO.println(chave + ": " + valor));
+		analyzer.getCountByTransactionType().forEach((chave, valor) -> IO.println("- " + chave + ": " + valor));
 
 	}
 }

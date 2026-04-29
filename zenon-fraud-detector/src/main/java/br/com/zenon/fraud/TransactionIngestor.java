@@ -25,7 +25,7 @@ public class TransactionIngestor {
 			while ((line = br.readLine()) != null) {
 					linesCount++;
 					lines.add(line);
-					if(linesCount == numberOfLines) break;
+					if(linesCount > numberOfLines) break;
 			}
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("Arquivo não encontrado.", e);
